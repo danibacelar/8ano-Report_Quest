@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Report Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef4f1;--card:#fff;--ink:#16292e;--mut:#5a6f73;--acc:#0f7a6d;--accs:#d8efe9;--bad:#c8473d;--bads:#fbe3e0;--ok:#25794a;--oks:#dcf3e2;--line:#c9d9d4;--hi:#ffc83d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1d20;--card:#17292d;--ink:#e8f1ee;--mut:#9bb2b5;--acc:#4fc3b0;--accs:#1d3b3a;--bad:#ff8a80;--bads:#3a1f1e;--ok:#7bd88f;--oks:#1b3524;--line:#2b4448;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1d20;--card:#17292d;--ink:#e8f1ee;--mut:#9bb2b5;--acc:#4fc3b0;--accs:#1d3b3a;--bad:#ff8a80;--bads:#3a1f1e;--ok:#7bd88f;--oks:#1b3524;--line:#2b4448;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:800 18px/1.45 Nunito,system-ui,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1,h2{font-family:Fredoka,system-ui,sans-serif;margin:0}
+h1{font-size:2.2rem;line-height:1.1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+.pill{background:var(--card);border:2px solid var(--line);border-radius:99px;padding:4px 14px;font-size:.95rem}
+.pill b{color:var(--acc)}
+.sub{color:var(--mut);font-weight:600;margin:6px 0 16px}
+.m{display:flex;gap:14px;align-items:center;width:100%;text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:10px;font:inherit;cursor:pointer}
+.m:hover,.m:focus-visible{border-color:var(--acc);outline:none}
+.m .e{font-size:2rem}.m small{display:block;color:var(--mut);font-weight:600;font-size:.85rem}
+.m .s{margin-left:auto;white-space:nowrap}
+.boss{border-color:var(--hi);border-width:3px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
+.bar{height:12px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.q{font-size:1.25rem;font-family:Fredoka,system-ui,sans-serif;font-weight:500}
+.src{color:var(--mut);font-weight:600}
+.o{display:block;width:100%;text-align:left;margin-top:10px;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.o:hover:not(:disabled),.o:focus-visible{border-color:var(--acc);outline:none}
+.o.bad{background:var(--bads);border-color:var(--bad);animation:sk .3s}
+.o.ok{background:var(--oks);border-color:var(--ok)}
+@keyframes sk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:14px;padding:13px 22px;font:inherit;cursor:pointer;margin:10px 8px 0 0}
+:root[data-theme="dark"] .btn{color:#0f1d20}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0f1d20}}
+.btn.g{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.fb{margin-top:12px;padding:12px 14px;border-radius:12px;font-weight:700}
+.fb.ok{background:var(--oks);color:var(--ok)}.fb.no{background:var(--bads);color:var(--bad)}
+.zone{min-height:64px;border:2px dashed var(--line);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ch{border:2px solid var(--acc);background:var(--accs);color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer}
+.ch:disabled{opacity:.25}
+.data{background:var(--accs);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.gap{border-bottom:3px solid var(--hi);padding:0 18px}
+.rep{background:var(--oks);border-radius:14px;padding:14px;margin-top:10px}
+details{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 16px;margin-top:14px}
+summary{cursor:pointer;font-family:Fredoka,system-ui,sans-serif}
+td{padding:4px 12px 4px 0;vertical-align:top}
+.slot{min-width:56px;height:42px;border:2px dashed var(--acc);border-radius:10px;display:inline-block}
+.ch.lock{opacity:1;background:var(--oks);border-color:var(--ok)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<div class="top"><span class="pill">⭐ <b id="pts">0</b></span><span class="pill">🔥 <b id="str">0</b> in a row</span></div>
+<div id="app"></div></main>
+<script>
+var S={pts:0,streak:0,best:{}},cur,qi,first,ok1,rep,opts,toks,placed,lock,lk;
+var $=function(i){return document.getElementById(i)};
+function sh(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function mc(t,o,tip,s){return{t:t,o:o,tip:tip,s:s}}
+var D="Data: 10% slept too much · 50% watched too much TV · 85% wasted time online";
+var M=[
+{id:0,e:"🗺️",n:"Report Map",d:"3 parts of a report",type:"mc",q:[
+mc("Which part says what the survey is about and how many people answered?",["Introduction","Main body","Conclusion"],"Introdução = o quê + quantas pessoas."),
+mc("Where do the detailed numbers go, in themed paragraphs?",["Main body","Introduction","Conclusion"],"Corpo = números e detalhes, em parágrafos por tema."),
+mc("Which part must NOT bring new numbers?",["Conclusion","Main body","Introduction"],"Conclusão = resumo geral, sem números novos."),
+mc("Which phrase opens a conclusion?",["To sum up","First, we asked","Furthermore","Fifty per cent said"],"“To sum up” ou “In conclusion” abrem a conclusão."),
+mc("“This survey investigates how 30 students spend a school day.” Which part?",["Introduction","Main body","Conclusion"],"Fala do tema e de 30 alunos: introdução."),
+mc("“Half of the respondents reported that they had used public transport.” Which part?",["Main body","Introduction","Conclusion"],"É um resultado com dado: corpo."),
+mc("What style does a report use?",["Formal and impersonal","Casual and personal","Funny and emotional"],"Relatório = formal e impessoal.")]},
+{id:1,e:"🔢",n:"Number Magic",d:"Percentages and reporting verbs",type:"mc",q:[
+mc("25% =",["a quarter","half","the vast majority"],"25% = one in four = a quarter."),
+mc("50% =",["half of the respondents","a tiny minority","eight out of ten"],"50% = half."),
+mc("80% =",["eight out of ten","one in four","less than half"],"80% = eight out of ten."),
+mc("95% =",["the vast majority","the minority","a quarter"],"85 a 95% = the (vast) majority."),
+mc("10% =",["one in ten","more than half","four out of ten"],"10% = one in ten / a tiny minority."),
+mc("40% =",["four out of ten","six out of ten","half"],"40% = four out of ten / less than half."),
+mc("60% =",["more than half","less than half","a quarter"],"60% = more than half = six out of ten."),
+mc("Which verb fits a bad habit?",["admitted","asked","replied"],"Admit = reconhecer algo ruim."),
+mc("Which verb introduces a question?",["asked","claimed","stated"],"Ask = para perguntas indiretas."),
+mc("Which verb fits a personal opinion or claim?",["claimed","asked","admitted"],"Claim = afirmar (algo subjetivo).")]},
+{id:2,e:"🧩",n:"Sentence Builder",d:"Tap the words in order",type:"build",q:[
+{src:"“How much time did you waste yesterday?”",a:"We asked respondents how much time they had wasted the previous day.",x:["did","have"],tip:"Pergunta indireta: sem inversão, passado perfeito."},
+{src:"One in four: “I got up earlier so that I would have more time.”",a:"One in four students replied that they had got up earlier so that they would have more time.",x:["got","have"],tip:"got up → had got up."},
+{src:"Half: “I watched too much television after dinner.”",a:"Half of the students admitted that they had watched too much television after dinner.",x:["watched","have"],tip:"watched → had watched."},
+{src:"Fifty per cent: “Public transport was much quicker than walking.”",a:"Fifty per cent reported that public transport had been much quicker than walking.",x:["was","has"],tip:"was → had been."},
+{src:"Twenty per cent: “I had less than two hours of free time on Monday.”",a:"Twenty per cent claimed that they had had less than two hours of free time on Monday.",x:["have","has"],tip:"had → had had (dois “had”)."}]},
+{id:3,e:"🐛",n:"Bug Hunt",d:"Find the correct sentence",type:"mc",q:[
+mc("Pick the correct sentence.",["First, we asked the participants how many hours they had spent studying.","First, we asked the participants how many hours had they spent studying.","First, we asked the participants how many hours did they spend studying."],"Pergunta indireta: sem inversão (they had, não had they)."),
+mc("Pick the correct sentence.",["The vast majority of students, over ninety per cent, reported having a mobile phone.","The vast minority of students, over ninety per cent, reported having a mobile phone."],"90% = majority. Minority é pouco."),
+mc("Pick the correct sentence.",["About half of the people in my class reported that they had watched too much television.","About half of the people in my class reported that they have watched too much television.","About half of the people in my class reported that they watch too much television."],"Relatório = voltar um tempo: had watched."),
+mc("Pick the correct sentence.",["Eight out of ten students said that they had between three and five hours of free time.","Eight of ten students said that they had between three and five hours of free time."],"É “out of”: eight out of ten."),
+mc("Pick the best conclusion.",["To sum up, this report shows that students spend significant amounts of time on their daily habits.","To sum up, this report is asking thirty students about their daily habits."],"Conclusão resume os resultados, não explica a pesquisa.")]},
+{id:4,e:"👑",n:"Final Boss",d:"Build the whole report",type:"mc",boss:1,q:[
+mc("In this survey, we asked 30 students how they ___ time the day before.",["had wasted","have wasted","did waste"],"Pergunta indireta + backshift: had wasted.","In this survey, we asked 30 students how they ___ time the day before."),
+mc("A small minority, ten per cent, ___ that they had slept too much.",["reported","reporting","report"],"Passado: reported.","A small minority, ten per cent, ___ that they had slept too much."),
+mc("About ___ of the students said they had watched too much television.",["half","the vast majority","a tiny minority"],"50% = half.","About ___ of the students said they had watched too much television."),
+mc("The vast majority admitted that they ___ too much time online.",["had spent","have spent","spend"],"Backshift: had spent.","The vast majority admitted that they ___ too much time online."),
+mc("To ___, students waste time in several ways.",["sum up","sum in","summary"],"To sum up = conclusão.","To ___, students waste time in several ways.")]}
+];
+function hud(){$("pts").textContent=S.pts;$("str").textContent=S.streak}
+var E=[
+["🗺️ As 3 partes do relatório","<p>Um relatório conta os resultados de uma pesquisa, em linguagem <b>formal</b> e <b>impessoal</b>.</p><p><b>1. Introduction</b>: o que a pesquisa investiga + quantas pessoas responderam.</p><div class='data'>This survey investigates how 30 students spend a school day.</div><p><b>2. Main body</b>: os resultados, com números, em parágrafos por tema.</p><div class='data'>Half of the respondents reported that they had used public transport.</div><p><b>3. Conclusion</b>: resumo geral, <b>sem números novos</b>. Começa com <b>To sum up</b>.</p><div class='data'>To sum up, students waste time in several ways.</div>"],
+["🔢 Porcentagens em palavras","<p>Em vez de repetir números, use expressões:</p><table><tr><td>10%</td><td>one in ten / a tiny minority</td></tr><tr><td>25%</td><td>a quarter / one in four</td></tr><tr><td>40%</td><td>less than half / four out of ten</td></tr><tr><td>50%</td><td>half of the respondents</td></tr><tr><td>60%</td><td>more than half / six out of ten</td></tr><tr><td>80%</td><td>eight out of ten</td></tr><tr><td>85–95%</td><td>the (vast) majority</td></tr></table><p>Cuidado: <b>vast majority</b> (muita gente), nunca “vast minority”. E é <b>eight OUT OF ten</b>.</p>"],
+["💬 Verbos para reportar","<p><b>asked</b>: para perguntas.</p><div class='data'>We asked how much free time they had had.</div><p><b>replied / stated / reported</b> + that</p><div class='data'>Fifty per cent reported that they had used public transport.</div><p><b>claimed</b>: algo que a pessoa afirma.</p><p><b>admitted</b>: hábito ruim.</p><div class='data'>The majority admitted that they had wasted time online.</div>"],
+["⏪ Voltar um tempo (backshift)","<p>A pesquisa já aconteceu, então voltamos um tempo no passado:</p><table><tr><td>watched, spent, did</td><td>→ had watched, had spent, had done</td></tr><tr><td>was / were</td><td>→ had been</td></tr><tr><td>had</td><td>→ had had</td></tr></table><div class='data'>“I watched too much TV.” → Half of the students admitted that they <b>had watched</b> too much TV.</div><p><b>Pergunta indireta</b>: sem inversão e sem “?”.</p><div class='data'>“How many hours did you spend?” → We asked how many hours they <b>had spent</b>.</div>"]
+];
+function explain(n){n=n||0;var p=E[n];$("app").innerHTML="<div class='bar'><i style='width:"+((n+1)/E.length*100)+"%'></i></div><button class='btn g' style='margin:0 0 10px' onclick='home()'>← Início</button><div class='card'><h2>"+p[0]+"</h2>"+p[1]+"</div>"+(n>0?"<button class='btn g' onclick='explain("+(n-1)+")'>← Voltar</button>":"")+(n<E.length-1?"<button class='btn' onclick='explain("+(n+1)+")'>Próximo →</button>":"<button class='btn' onclick='exs()'>Ir para os exercícios 🎮</button>")}
+function home(){cur=null;hud();$("app").innerHTML="<h1>Report Quest</h1><p class='sub'>Revisão para a prova: Writing a Report. Comece pela explicação!</p><button class='m' onclick='explain()'><span class='e'>📖</span><span>Explicação<small>Teoria com exemplos, passo a passo</small></span></button><button class='m boss' onclick='exs()'><span class='e'>🎮</span><span>Exercícios<small>Missões em formato de jogo</small></span></button>"}
+function exs(){cur=null;hud();var h="<button class='btn g' style='margin:0 0 10px' onclick='home()'>← Início</button><h1>Exercícios</h1><p class='sub'>Escolha uma missão. Errou? Tente de novo!</p>";
+M.forEach(function(m,i){var b=S.best[i]||0;h+="<button class='m"+(m.boss?" boss":"")+"' onclick='start("+i+")'><span class='e'>"+m.e+"</span><span>"+m.n+"<small>"+m.d+"</small></span><span class='s'>"+"⭐".repeat(b)+"☆".repeat(3-b)+"</span></button>"});
+h+="<details><summary>🧠 Quick map (read first, 1 min)</summary><table><tr><td>10%</td><td>one in ten</td></tr><tr><td>25%</td><td>a quarter</td></tr><tr><td>40%</td><td>less than half</td></tr><tr><td>50%</td><td>half</td></tr><tr><td>60%</td><td>more than half</td></tr><tr><td>80%</td><td>eight out of ten</td></tr><tr><td>85–95%</td><td>the (vast) majority</td></tr></table><p>Verbs: <b>asked</b> (questions) · <b>reported / replied / stated</b> + that · <b>claimed</b> · <b>admitted</b> (bad habit)</p><p>Tempo: <b>did → had done</b>, <b>was → had been</b>. Indirect question: <b>how many hours they had spent</b>.</p><p>Parts: Introduction · Main body · Conclusion (To sum up…)</p></details>";
+$("app").innerHTML=h}
+function howto(){$("app").innerHTML="<button class='btn g' style='margin:0 0 10px' onclick='exs()'>← Voltar</button><div class='card'><h2>🧩 Como funciona</h2><p>Você vai transformar o que alguém disse em uma frase de relatório, tocando nas palavras na ordem certa.</p><p><b>Exemplo:</b></p><div class='data'>Alguém disse: “I watched too much TV.”</div><div class='data'>Passo 1: quem respondeu → <b>Half of the students</b><br>Passo 2: o verbo → <b>admitted that</b><br>Passo 3: voltar um tempo → <b>they had watched</b><br>Passo 4: o resto da ideia → <b>too much TV.</b></div><div class='data'>Half of the students admitted that they had watched too much TV.</div><p>Se errar, só as palavras erradas saem. As certas (verdes) ficam no lugar. É só completar os espaços vazios.</p><button class='btn' onclick='show()'>Entendi, vamos! 🚀</button></div>"}
+function start(i){cur=M[i];qi=0;ok1=0;rep=[];if(cur.type=="build")return howto();show()}
+function bar(){return "<div class='bar'><i style='width:"+(qi/cur.q.length*100)+"%'></i></div><button class='btn g' style='margin:0 0 10px' onclick='exs()'>← Missões</button> <span class='src'>"+cur.n+" · "+(qi+1)+"/"+cur.q.length+"</span>"}
+function show(){if(qi>=cur.q.length)return end();var q=cur.q[qi];first=true;lock=false;
+if(cur.type=="build"){var n=q.a.split(" ").length;toks=sh(q.a.split(" ").concat(q.x));placed=[];lk=[];for(var z=0;z<n;z++){placed.push(-1);lk.push(0)}drawB();return}
+opts=sh(q.o.map(function(x,i){return{x:x,c:i==0}}));
+var h=bar()+"<div class='card'>"+(cur.boss?"<div class='data'>"+D+"</div>":"")+"<div class='q'>"+(q.s?q.s.replace("___","<span class='gap'></span>"):q.t)+"</div>";
+opts.forEach(function(o,k){h+="<button class='o' onclick='pick("+k+")'>"+o.x+"</button>"});
+$("app").innerHTML=h+"<div id='fb'></div></div>"}
+function win(q,fill){lock=true;if(first){S.pts+=10;S.streak++;ok1++}else S.pts+=5;hud();
+$("fb").innerHTML="<div class='fb ok'>✅ "+["Great!","Yes!","Nice one!","Perfect!"][Math.floor(Math.random()*4)]+" "+q.tip+"</div><button class='btn' onclick='qi++;show()'>Next →</button>";
+if(cur.boss)rep.push(fill)}
+function lose(q){first=false;S.streak=0;hud();$("fb").innerHTML="<div class='fb no'>Not yet. Tip: "+q.tip+"</div>"}
+function pick(k){if(lock)return;var q=cur.q[qi],o=opts[k],b=document.querySelectorAll(".o")[k];
+if(o.c){b.classList.add("ok");document.querySelectorAll(".o").forEach(function(x){x.disabled=true});win(q,q.s&&q.s.replace("___",o.x))}else{b.classList.add("bad");b.disabled=true;lose(q)}}
+function drawB(m){var q=cur.q[qi],h=bar()+"<div class='card'><div class='q'>Escreva a frase do relatório:</div><p class='src'>"+q.src+"</p><div class='zone'>";
+placed.forEach(function(t,p){h+=t<0?"<span class='slot'></span>":"<button class='ch"+(lk[p]?" lock":"")+"' "+(lk[p]?"disabled":"")+" onclick='undo("+p+")'>"+toks[t]+"</button>"});
+h+="</div><div class='zone' style='border:0;padding:0;margin-top:12px'>";
+toks.forEach(function(w,i){h+="<button class='ch' "+(placed.indexOf(i)>-1?"disabled":"")+" onclick='add("+i+")'>"+w+"</button>"});
+$("app").innerHTML=h+"</div><button id='ck' class='btn' onclick='chk()'>Check ✓</button><button class='btn g' onclick='clr()'>Limpar</button><div id='fb'>"+(m||"")+"</div></div>"}
+function add(i){if(lock)return;var k=placed.indexOf(-1);if(k<0)return;placed[k]=i;drawB()}
+function undo(p){if(lock||lk[p])return;placed[p]=-1;drawB()}
+function clr(){if(lock)return;placed.forEach(function(t,p){if(!lk[p])placed[p]=-1});drawB()}
+function chk(){if(lock)return;if(placed.indexOf(-1)>-1){drawB("<div class='fb no'>Preencha todos os espaços primeiro.</div>");return}
+var q=cur.q[qi],w=q.a.split(" "),bad=0;
+placed.forEach(function(t,p){if(toks[t]==w[p])lk[p]=1;else{placed[p]=-1;bad++}});
+if(!bad){drawB();$("ck").remove();win(q);return}
+lose(q);drawB("<div class='fb no'>Quase! Tirei só "+bad+" palavra(s) errada(s). As verdes estão certas: complete os espaços vazios. Dica: "+q.tip+"</div>")}
+function end(){var n=cur.q.length,r=ok1/n,st=r>=.8?3:r>=.5?2:1;S.best[cur.id]=Math.max(S.best[cur.id]||0,st);
+var h="<div class='card'><h2>Mission complete! "+"⭐".repeat(st)+"</h2><p>"+ok1+" of "+n+" right on the first try.</p>";
+if(cur.boss)h+="<div class='rep'><b>Your report:</b><br>"+rep.join(" ")+"</div>";
+h+="<p class='src'>💧 Mini break: stand up, drink water, stretch for 1 minute.</p><button class='btn' onclick='exs()'>Voltar às missões</button><button class='btn g' onclick='start("+cur.id+")'>Play again</button></div>";
+$("app").innerHTML=h}
+home();
+</script></body></html>
